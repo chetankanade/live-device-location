@@ -2,13 +2,13 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
-const cors = require('cors');
+// const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-app.use(cors());
+// app.use(cors());
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
@@ -18,14 +18,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Socket.IO connection handling
 io.on('connection', (socket) => {
     console.log('A user connected');
-    socket.emit('welcome', 'Welcome to the server');
-    
-    socket.on('send-location', (location) => {
-        console.log(location);
+
+    socket.on('send-location', (data) => {
+
+        io.emit('receive-location', { id: socket.id, ...data });
     });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        io.emit('user-disconnected', socket.id);
     });
 });
 
